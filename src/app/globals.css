@@ -1,26 +1,95 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  --color-brand: #297cf5;
+  --color-brand-deep: #1857c4;
+  --color-ink: #070d1a;
+  --color-ink-soft: #0d1526;
+  --color-cloud: #f3f6fb;
+  --color-mist: #e6ecf6;
+  --color-acc-green: #56b64e;
+  --color-acc-orange: #f49b4a;
+  --color-acc-cyan: #23c1ef;
+  --color-acc-steel: #8b95a5;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-mulish), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-poppins), ui-sans-serif, system-ui, sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  scroll-behavior: auto;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: #ffffff;
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  overflow-x: clip;
+}
+
+::selection {
+  background: var(--color-brand);
+  color: #fff;
+}
+
+/* ---------- headline word reveal ---------- */
+.word-mask {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: bottom;
+  padding-bottom: 0.08em;
+  margin-bottom: -0.08em;
+}
+.word-mask > span {
+  display: inline-block;
+  will-change: transform;
+}
+
+/* ---------- trust marquee ---------- */
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marquee 36s linear infinite;
+}
+.marquee-track:hover {
+  animation-play-state: paused;
+}
+
+/* ---------- floating bubbles in wipe section ---------- */
+@keyframes bubble-pop {
+  0%   { transform: translateY(0) scale(0); opacity: 0; }
+  20%  { opacity: 1; }
+  100% { transform: translateY(-140px) scale(1); opacity: 0; }
+}
+.bubble {
+  animation: bubble-pop 1.4s ease-out forwards;
+}
+
+/* ---------- scroll hint ---------- */
+@keyframes drip {
+  0%   { transform: translateY(-6px); opacity: 0; }
+  40%  { opacity: 1; }
+  100% { transform: translateY(10px); opacity: 0; }
+}
+.scroll-drip {
+  animation: drip 1.6s ease-in-out infinite;
+}
+
+/* ---------- slow drum spin for decorative marks ---------- */
+@keyframes spin-slow {
+  to { transform: rotate(360deg); }
+}
+.spin-slow {
+  animation: spin-slow 14s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track { animation-duration: 80s; }
+  .scroll-drip, .spin-slow, .bubble { animation: none; }
 }
