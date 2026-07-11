@@ -66,9 +66,10 @@ export default function Preloader() {
       style={{ clipPath: "inset(0 0 0% 0)" }}
       aria-hidden
     >
+      {/* The mark spins beyond its tight viewBox, so its overflow must remain visible. */}
       <svg
         viewBox="933.87 545.27 129.19 134.28"
-        className="w-24 md:w-28"
+        className="w-24 overflow-visible md:w-28"
         xmlns="http://www.w3.org/2000/svg"
       >
         <g id="pre-mark">
