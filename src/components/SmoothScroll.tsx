@@ -12,6 +12,12 @@ export default function SmoothScroll() {
       lerp: 0.09,
       wheelMultiplier: 1,
       touchMultiplier: 1.4,
+      // Lenis blocks native hash navigation unless anchors are explicitly
+      // enabled. Keep the destination clear of the fixed navigation bar.
+      anchors: {
+        offset: -96,
+        duration: 1.05,
+      },
     });
 
     lenis.on("scroll", ScrollTrigger.update);
