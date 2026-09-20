@@ -1,3 +1,5 @@
+import ArrowIcon from "@/components/ArrowIcon";
+
 import NextImage from "next/image";
 import { asset } from "@/lib/asset";
 
@@ -10,7 +12,7 @@ export default function WipeClean() {
           <h2 className="section-title">First impressions.<br /><span className="text-brand-deep">Lasting care.</span></h2>
           <p>The cleanliness and presentation of sheets and towels shape the moment a guest walks into a room.</p>
           <p>Eco Clean collects used linen and returns it clean, while supplying textiles selected to balance quality, comfort and cost. Our service is built around your business&apos;s commercial and operational needs.</p>
-          <a className="text-link" href={asset("/catalog/#page-7")}>Explore our hotel services <span aria-hidden="true">↗</span></a>
+          <a className="text-link" href={asset("/catalog/#page-7")}>Explore our hotel services <span aria-hidden="true"><ArrowIcon /></span></a>
         </div>
       </div>
     </section>

@@ -17,8 +17,22 @@
   --font-display: var(--font-poppins), ui-sans-serif, system-ui, sans-serif;
 }
 :root { --page-gutter: clamp(1.5rem, 4vw, 2.5rem); --section-space: clamp(5rem, 9vw, 8rem); }
-html { scroll-behavior: smooth; scroll-padding-top: 6.5rem; }
-body { background: #fff; color: var(--color-ink); font-family: var(--font-mulish), sans-serif; }
+html { scroll-behavior: smooth; scroll-padding-top: 6.5rem; scrollbar-gutter: stable; overscroll-behavior-y: none; background: var(--color-ink); }
+body { background: #fff; color: var(--color-ink); font-family: var(--font-mulish), sans-serif; overscroll-behavior-y: none; }
+
+/* Keep the overlay out of document flow, including during its exit. */
+.mobile-menu { visibility: hidden; opacity: 0; pointer-events: none; overscroll-behavior: contain; transition: opacity 300ms ease, visibility 0s 300ms; }
+.mobile-menu[data-open="true"] { visibility: visible; opacity: 1; pointer-events: auto; transition-delay: 0s; }
+.mobile-menu a { opacity: 0; transform: translateY(18px); transition: opacity 180ms ease, transform 240ms ease; }
+.mobile-menu[data-open="true"] a { opacity: 1; transform: translateY(0); transition-duration: 420ms; transition-timing-function: cubic-bezier(.2,.7,.2,1); transition-delay: 90ms; }
+.mobile-menu[data-open="true"] a:nth-child(2) { transition-delay: 130ms; }
+.mobile-menu[data-open="true"] a:nth-child(3) { transition-delay: 170ms; }
+.mobile-menu[data-open="true"] a:nth-child(4) { transition-delay: 210ms; }
+.mobile-menu[data-open="true"] a:nth-child(5) { transition-delay: 250ms; }
+.menu-toggle-icon path { transform-origin: 10px 10px; transition: transform 300ms cubic-bezier(.2,.7,.2,1); }
+.menu-toggle-icon[data-open="true"] path:first-child { transform: translateY(4px) rotate(45deg); transform-origin: 10px 6px; }
+.menu-toggle-icon[data-open="true"] path:last-child { transform: translateY(-4px) rotate(-45deg); transform-origin: 10px 14px; }
+.arrow-icon { display: inline-block; width: 1em; height: 1em; flex-shrink: 0; vertical-align: -.12em; }
 ::selection { background: var(--color-brand-deep); color: #fff; }
 h1, h2, h3 { text-wrap: balance; }
 p { text-wrap: pretty; }
@@ -67,6 +81,26 @@ a:focus-visible, button:focus-visible, input:focus-visible { outline: 3px solid 
 .trust-client strong { display: block; font-size: .8rem; font-weight: 700; }
 .trust-client span { display: block; margin-top: 4px; font-size: .7rem; color: #667083; }
 .trust-hotel svg { color: #6a7d99; }
+.trust-tape { overflow: clip; }
+.trust-tape-heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 18px; }
+.trust-tape-heading p { font-size: .65rem; letter-spacing: .16em; text-transform: uppercase; color: #667083; }
+.trust-tape-heading button { display: grid; place-items: center; width: 44px; height: 44px; border: 1px solid #e7ebf1; border-radius: 50%; color: #667083; cursor: pointer; }
+.trust-tape-window { overflow: hidden; mask-image: linear-gradient(to right, transparent, #000 6%, #000 94%, transparent); }
+.trust-tape-track { display: flex; width: max-content; animation: trust-tape-travel 38s linear infinite; }
+.trust-tape-group { display: flex; align-items: center; gap: 64px; padding-right: 64px; flex-shrink: 0; }
+.trust-tape .trust-client { white-space: nowrap; flex-shrink: 0; }
+.trust-tape .trust-client::after { content: ""; width: 3px; height: 3px; border-radius: 50%; background: #b9c7d9; margin-left: 40px; }
+.trust-line-mark { color: #6783a7; }
+.trust-tape[data-paused="true"] .trust-tape-track { animation-play-state: paused; }
+@media (hover: hover) { .trust-tape:hover .trust-tape-track { animation-play-state: paused; } }
+@keyframes trust-tape-travel { to { transform: translateX(-50%); } }
+@media (prefers-reduced-motion: reduce) {
+  .mobile-menu, .mobile-menu a { transition-delay: 0s !important; }
+  .trust-tape-track { width: auto; }
+  .trust-tape-group { flex-wrap: wrap; justify-content: center; gap: 24px; padding: 0 24px; }
+  .trust-tape-group[aria-hidden="true"], .trust-tape-heading button, .trust-tape .trust-client::after { display: none; }
+  .trust-tape-window { mask-image: none; }
+}
 
 /* A consistent image-and-type grid across the four industries. */
 .services-section { padding-block: var(--section-space); }

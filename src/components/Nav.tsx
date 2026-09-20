@@ -19,17 +19,36 @@ export default function Nav({ catalogPage = false }: { catalogPage?: boolean }) 
   const menu = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    // Resolve cross-page anchors after fonts and entrance effects establish layout.
+    const id = window.location.hash.slice(1);
+    if (catalogPage || !id) return;
+    let cancelled = false;
+    let frame = 0;
+    document.fonts.ready.then(() => {
+      if (cancelled) return;
+      frame = requestAnimationFrame(() => {
+        frame = requestAnimationFrame(() => {
+          if (!cancelled) document.getElementById(id)?.scrollIntoView({ behavior: "instant" });
+        });
+      });
+    });
+    return () => { cancelled = true; cancelAnimationFrame(frame); };
+  }, [catalogPage]);
+
+  useEffect(() => {
     if (!open) return;
     const toggleButton = toggle.current;
     const main = document.querySelector("main");
     const footer = document.querySelector("footer");
     const previousOverflow = document.body.style.overflow;
+    const previousRootOverflow = document.documentElement.style.overflow;
     const previousMainInert = main?.inert ?? false;
     const previousFooterInert = footer?.inert ?? false;
     document.body.style.overflow = "hidden";
+    document.documentElement.style.overflow = "hidden";
     if (main) main.inert = true;
     if (footer) footer.inert = true;
-    menu.current?.querySelector<HTMLAnchorElement>("a")?.focus();
+    menu.current?.querySelector<HTMLAnchorElement>("a")?.focus({ preventScroll: true });
     const close = () => setOpen(false);
     const onKey = (event: KeyboardEvent) => {
       if (event.key === "Escape") { event.preventDefault(); close(); }
@@ -44,11 +63,12 @@ export default function Nav({ catalogPage = false }: { catalogPage?: boolean }) 
     document.addEventListener("keydown", onKey);
     return () => {
       document.body.style.overflow = previousOverflow;
+      document.documentElement.style.overflow = previousRootOverflow;
       if (main) main.inert = previousMainInert;
       if (footer) footer.inert = previousFooterInert;
       desktop.removeEventListener("change", close);
       document.removeEventListener("keydown", onKey);
-      toggleButton?.focus();
+      toggleButton?.focus({ preventScroll: true });
     };
   }, [open]);
 
@@ -118,12 +138,8 @@ export default function Nav({ catalogPage = false }: { catalogPage?: boolean }) 
                 (light || open) ? "text-ink hover:bg-black/5" : "text-white hover:bg-white/10"
               }`}
             >
-              <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden>
-                {open ? (
-                  <path d="M4 4l12 12M16 4L4 16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                ) : (
-                  <path d="M2 5h16M2 10h16M2 15h16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                )}
+              <svg className="menu-toggle-icon" data-open={open} width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" aria-hidden>
+                <path d="M2 6h16" /><path d="M2 14h16" />
               </svg>
             </button>
           </div>
@@ -131,8 +147,7 @@ export default function Nav({ catalogPage = false }: { catalogPage?: boolean }) 
       </header>
 
       {/* mobile menu */}
-      {open && (
-        <div id="mobile-menu" ref={menu} className="fixed inset-0 z-40 overflow-y-auto bg-ink lg:hidden" aria-label="Mobile navigation">
+        <div id="mobile-menu" ref={menu} data-open={open} inert={!open} aria-hidden={!open} className="mobile-menu fixed inset-0 z-40 overflow-y-auto bg-ink lg:hidden" aria-label="Mobile navigation">
           <div className="flex min-h-full py-28 flex-col items-center justify-center gap-2">
             {LINKS.map((l) => (
               <a
@@ -154,7 +169,6 @@ export default function Nav({ catalogPage = false }: { catalogPage?: boolean }) 
             </a>
           </div>
         </div>
-      )}
     </>
   );
 }

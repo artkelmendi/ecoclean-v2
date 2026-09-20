@@ -1,5 +1,7 @@
 "use client";
 
+import ArrowIcon from "@/components/ArrowIcon";
+
 import { useEffect, useState } from "react";
 import NextImage from "next/image";
 import albanianPages from "@/data/catalog-pages.json";
@@ -38,10 +40,10 @@ export default function CatalogReader() {
       <h2>Choose an edition</h2>
       <div className="catalog-editions" role="group" aria-label="Catalog edition">{(Object.keys(EDITIONS) as Edition[]).map(key => <button key={key} type="button" className="catalog-edition" aria-pressed={edition === key} onClick={() => setEdition(key)}>{EDITIONS[key].label}</button>)}</div>
       <nav aria-label="Catalog chapters">{CHAPTERS.map(c => <button key={c.page} type="button" onClick={() => go(c.page)} aria-current={chapter === c.page ? "location" : undefined}><span>{c.title}</span><span>{String(c.page).padStart(2, "0")}</span></button>)}</nav>
-      <p>The original document is preserved in full, including its blank second page.</p><a className="text-link" href={asset(active.file)} target="_blank" rel="noopener noreferrer">Open {active.label} PDF ↗</a>
+      <p>The original document is preserved in full, including its blank second page.</p><a className="text-link" href={asset(active.file)} target="_blank" rel="noopener noreferrer">Open {active.label} PDF <ArrowIcon /></a>
     </aside>
     <div className="catalog-reader-main" onKeyDown={e => { if ((e.target as HTMLElement).tagName === "SELECT") return; if (e.key === "ArrowRight") { e.preventDefault(); go(current + 1); } if (e.key === "ArrowLeft") { e.preventDefault(); go(current - 1); } }}>
-      <div className="reader-toolbar"><button type="button" aria-label="Previous page" onClick={() => go(current - 1)} disabled={current === 1}>←</button><label htmlFor="catalog-page-select">Page <select id="catalog-page-select" value={current} onChange={e => go(Number(e.target.value))}>{pages.map(p => <option key={p.page} value={p.page}>{p.page}</option>)}</select> of {pages.length}</label><button type="button" aria-label="Next page" onClick={() => go(current + 1)} disabled={current === pages.length}>→</button></div>
+      <div className="reader-toolbar"><button type="button" aria-label="Previous page" onClick={() => go(current - 1)} disabled={current === 1}><ArrowIcon direction="left" /></button><label htmlFor="catalog-page-select">Page <select id="catalog-page-select" value={current} onChange={e => go(Number(e.target.value))}>{pages.map(p => <option key={p.page} value={p.page}>{p.page}</option>)}</select> of {pages.length}</label><button type="button" aria-label="Next page" onClick={() => go(current + 1)} disabled={current === pages.length}><ArrowIcon direction="right" /></button></div>
       <div className="catalog-paper" tabIndex={0} aria-label="Catalog page. Use left and right arrow keys to turn pages."><NextImage key={`${edition}-${current}`} onLoad={event => event.currentTarget.classList.add("page-ready")} src={asset(`/catalog/${active.imagePrefix}${String(current).padStart(2, "0")}.webp`)} width={776} height={1100} alt={`${active.label} catalog, page ${current}: ${page.title}`} lang={active.language} priority={current === 1} /></div>
       <p className="reader-status" role="status" aria-live="polite">{active.label} · Page {current} of {pages.length} · <span lang={active.language}>{page.title}</span></p>
       {page.text ? <details className="catalog-transcript" key={`${edition}-${current}`}><summary>Read page text</summary><p lang={active.language}>{page.text}</p></details> : <p className="reader-image-note">{current === 2 ? "This page is blank in the original catalog." : "This is an image page in the original catalog."}</p>}
