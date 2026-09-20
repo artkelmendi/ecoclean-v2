@@ -11,11 +11,12 @@ export default function PageMotion() {
       if (!context.conditions?.motion) return;
       const desktop = context.conditions.desktop;
       // Scroll only triggers an entrance; it never controls playback or reverses it.
-      const scroll = (trigger: Element | string, start = "top 88%", end?: string) => ({ trigger, start, end, once: true, toggleActions: "play none none none" });
+      // Keep triggers registered until cleanup: killing passed triggers during
+      // refresh can invalidate GSAP's iteration when restoring a deep scroll.
+      const scroll = (trigger: Element | string, start = "top 88%", end?: string) => ({ trigger, start, end, toggleActions: "play none none none" });
       gsap.utils.toArray<HTMLElement>(".services-heading, .process-heading, .textile-copy, .about-heading, .catalog-teaser-copy").forEach(block => {
         gsap.fromTo(block, { opacity: 0, y: 26, clipPath: "inset(0 0 12% 0)" }, { opacity: 1, y: 0, clipPath: "inset(0 0 0% 0)", duration: .8, ease: "power3.out", scrollTrigger: scroll(block) });
       });
-      gsap.fromTo(".sector-mark", { rotateY: -65, opacity: .45 }, { rotateY: 0, opacity: 1, stagger: .14, ease: "power2.out", scrollTrigger: scroll(".trust-section", "top 95%", "center 70%") });
       gsap.utils.toArray<HTMLElement>(".service-card").forEach((card, i) => {
         const visual = card.querySelector(".service-image");
         const photo = visual?.querySelector("img");

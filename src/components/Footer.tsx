@@ -1,3 +1,5 @@
+import ArrowIcon from "@/components/ArrowIcon";
+
 import NextImage from "next/image";
 import { asset } from "@/lib/asset";
 
@@ -23,7 +25,7 @@ export default function Footer() {
               <ul className="space-y-2 text-sm text-white/80">
                 <li><a href="tel:+38348886644">048 88 66 44</a></li>
                 <li>Magjistralja Prishtinë–Gjilan<br />Hajvali, Prishtinë</li>
-                <li><a href="https://www.ecc-usa.com" target="_blank" rel="noopener noreferrer">www.ecc-usa.com ↗</a></li>
+                <li><a href="https://www.ecc-usa.com" target="_blank" rel="noopener noreferrer">www.ecc-usa.com <ArrowIcon /></a></li>
               </ul>
             </div>
           </div>

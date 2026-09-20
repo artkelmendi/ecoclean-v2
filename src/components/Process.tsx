@@ -44,7 +44,10 @@ export default function Process() {
       };
       const motion = { progress: 0 };
       rows.forEach((row, i) => {
-        ScrollTrigger.create({ trigger: row, start: "top 72%", once: true, onEnter: () => {
+        let entered = false;
+        ScrollTrigger.create({ trigger: row, start: "top 72%", onEnter: () => {
+          if (entered) return;
+          entered = true;
           gsap.to(motion, { progress: (i + .25) / STEPS.length, duration: .85, ease: "power3.out", overwrite: true, onUpdate: () => update(motion.progress) });
         } });
       });
