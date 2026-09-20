@@ -18,11 +18,11 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://artkelmendi.github.io/ecoclean-v2"),
   title: "Eco Clean — Industrial Laundry & Textile Care, Kosovo",
   description:
-    "Kosovo's leading industrial laundry. Trusted by the Kosovo Police, the Kosovo Security Force and the country's finest hotels. Hotel linen, restaurant textiles, healthcare and uniform programs — with a 24h turnaround.",
+    "Eco Clean provides textile supply and laundry services for hotels, restaurants, hospitals and other businesses across Kosovo and the region.",
   openGraph: {
     title: "Eco Clean — The standard of clean.",
     description:
-      "Industrial laundry trusted by the Kosovo Police, the KSF and Kosovo's finest hotels.",
+      "Textile supply, laundry services and Streamline stock management across Kosovo and the region.",
     images: [`${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/media/drum-poster.jpg`],
   },
 };

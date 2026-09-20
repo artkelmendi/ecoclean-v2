@@ -1,5 +1,6 @@
-import SmoothScroll from "@/components/SmoothScroll";
-import Preloader from "@/components/Preloader";
+import BrandIntro from "@/components/BrandIntro";
+import PageMotion from "@/components/PageMotion";
+import CatalogTeaser from "@/components/CatalogTeaser";
 import Nav from "@/components/Nav";
 import Hero from "@/components/Hero";
 import TrustMarquee from "@/components/TrustMarquee";
@@ -13,16 +14,17 @@ import Footer from "@/components/Footer";
 export default function Home() {
   return (
     <>
-      <SmoothScroll />
-      <Preloader />
+      <BrandIntro />
+      <PageMotion />
       <Nav />
-      <main>
+      <main id="main-content" tabIndex={-1}>
         <Hero />
         <TrustMarquee />
         <Services />
         <Process />
         <WipeClean />
         <Stats />
+        <CatalogTeaser />
         <CTA />
       </main>
       <Footer />

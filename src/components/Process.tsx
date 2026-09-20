@@ -1,165 +1,124 @@
 "use client";
 
+import NextImage from "next/image";
 import { useEffect, useRef } from "react";
 import { gsap, ScrollTrigger } from "@/lib/gsap";
 import { asset } from "@/lib/asset";
 
-type Step = {
-  n: string;
-  title: string;
-  copy: string;
-  img?: string;
-  alt?: string;
-  video?: boolean;
-};
-
-const STEPS: Step[] = [
-  {
-    n: "01",
-    title: "Collect",
-    copy: "Scheduled pick-up from your hotel, kitchen, clinic or base — sealed, logged and barcoded at your door.",
-    img: "/img/hotel-night.jpg",
-    alt: "Luxury hotel at night",
-  },
-  {
-    n: "02",
-    title: "Sort & Tag",
-    copy: "Every batch is separated by fabric, colour and hygiene class. Nothing of yours ever mixes with anyone else's.",
-    img: "/img/gloves-heart.jpg",
-    alt: "Gloved hands forming a heart",
-  },
-  {
-    n: "03",
-    title: "Wash",
-    copy: "Industrial drums, calibrated chemistry, thermal disinfection. This is the inside of one — in motion.",
-    video: true,
-  },
-  {
-    n: "04",
-    title: "Press & Finish",
-    copy: "Roller-ironed flatwork, hand-finished garments, crisp folds. Every piece inspected before it leaves.",
-    img: "/img/shirts.jpg",
-    alt: "Pressed white shirts on hangers",
-  },
-  {
-    n: "05",
-    title: "Deliver",
-    copy: "Back to your shelves in 24 hours — wrapped, counted and ready for service.",
-    img: "/img/hotel-bright.jpg",
-    alt: "Bright, freshly made hotel room",
-  },
+const STEPS = [
+  { title: "Count", copy: "Count the clean stock on your shelves and send the figures once a week.", img: "/img/hotel-bed.jpg", alt: "Clean hotel bedding" },
+  { title: "Calculate", copy: "Eco Clean calculates your next stock delivery using the previous week's delivery, recent usage and the stock you already hold.", img: "/catalog/catalog-12.webp", alt: "Stock management photograph from the Eco Clean catalog" },
+  { title: "Review", copy: "Stock levels are reviewed so the quantities supplied continue to match your business needs.", img: "/img/shirts.jpg", alt: "Fresh shirts ready for service" },
+  { title: "Deliver", copy: "Sufficient stock is delivered once a week. Express services are also available for emergencies.", img: "/img/hotel-bright.jpg", alt: "Hotel room prepared for guests" },
 ];
 
+/** One drop follows one complete care cycle. Native scrolling drives the diagram. */
 export default function Process() {
   const root = useRef<HTMLElement>(null);
-  const track = useRef<HTMLDivElement>(null);
-  const bar = useRef<HTMLDivElement>(null);
+  const drop = useRef<SVGGElement>(null);
+  const trail = useRef<SVGCircleElement>(null);
+  const number = useRef<HTMLSpanElement>(null);
+  const label = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
-    const ctx = gsap.context(() => {
-      const t = track.current;
-      if (!t) return;
-
-      const getAmount = () => t.scrollWidth - window.innerWidth;
-
-      gsap.to(t, {
-        x: () => -getAmount(),
-        ease: "none",
-        scrollTrigger: {
-          trigger: root.current,
-          start: "top top",
-          end: () => `+=${getAmount()}`,
-          pin: true,
-          scrub: 1,
-          anticipatePin: 1,
-          invalidateOnRefresh: true,
-          onUpdate: (self) => {
-            if (bar.current) bar.current.style.width = `${self.progress * 100}%`;
-          },
-        },
+    const mm = gsap.matchMedia();
+    mm.add("(prefers-reduced-motion: no-preference)", () => {
+      const section = root.current;
+      if (!section || !drop.current) return;
+      const rows = Array.from(section.querySelectorAll<HTMLElement>(".process-step"));
+      let active = -1;
+      const update = (progress: number) => {
+        const angle = progress * Math.PI * 2 - Math.PI / 2;
+        const x = 180 + 132 * Math.cos(angle);
+        const y = 180 + 132 * Math.sin(angle);
+        // A tiny scale change suggests the drop passing around the far side.
+        const scale = 0.9 + 0.1 * Math.sin(angle);
+        drop.current?.setAttribute("transform", `translate(${x} ${y}) rotate(${progress * 360}) scale(${scale})`);
+        trail.current?.setAttribute("stroke-dashoffset", String(1 - progress));
+        const next = Math.min(STEPS.length - 1, Math.floor(progress * STEPS.length));
+        if (next === active) return;
+        active = next;
+        rows.forEach((row, i) => { row.dataset.active = String(i === next); });
+        if (number.current) number.current.textContent = `0${next + 1}`;
+        if (label.current) label.current.textContent = STEPS[next].title;
+      };
+      const motion = { progress: 0 };
+      rows.forEach((row, i) => {
+        ScrollTrigger.create({ trigger: row, start: "top 72%", once: true, onEnter: () => {
+          gsap.to(motion, { progress: (i + .25) / STEPS.length, duration: .85, ease: "power3.out", overwrite: true, onUpdate: () => update(motion.progress) });
+        } });
       });
+      update(0);
+      let alive = true;
+      document.fonts.ready.then(() => { if (alive) ScrollTrigger.refresh(); });
+      return () => {
+        alive = false;
+        rows.forEach(row => { delete row.dataset.active; });
+        drop.current?.setAttribute("transform", "translate(180 48) scale(.8)");
+        trail.current?.setAttribute("stroke-dashoffset", "1");
+        if (number.current) number.current.textContent = "04";
+        if (label.current) label.current.textContent = "The linen cycle";
+      };
     }, root);
-    return () => {
-      ctx.revert();
-      ScrollTrigger.refresh();
-    };
+    return () => mm.revert();
   }, []);
 
   return (
-    <section id="process" ref={root} className="relative overflow-hidden bg-ink text-white">
-      <div className="flex h-[100svh] flex-col justify-center">
-        <div className="mx-auto mb-10 w-full max-w-6xl px-6 md:px-10">
-          <p className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.06] px-4 py-2 text-xs font-bold tracking-[0.22em] text-white/85">
-            THE 24-HOUR LOOP
-          </p>
-          <div className="flex flex-wrap items-end justify-between gap-4">
-            <h2 className="font-display text-4xl font-bold tracking-tight md:text-6xl">
-              Door to door in <span className="text-brand">24h.</span>
-            </h2>
-            <div className="hidden h-1.5 w-56 overflow-hidden rounded-full bg-white/10 md:block">
-              <div ref={bar} className="h-full w-0 rounded-full bg-brand" />
+    <section id="process" ref={root} className="process-section" aria-labelledby="process-title">
+      <div className="process-layout page-shell">
+        <div className="process-intro">
+          <div className="process-heading">
+            <h2 id="process-title" className="section-title text-white">The right linen.<br /><span className="text-[#7fb2ff]">Always in reach.</span></h2>
+            <p className="process-description">The Streamline system.<br />Stock managed around your business.</p>
+          </div>
+          <div className="care-cycle" aria-hidden="true">
+            <svg className="care-orbit" viewBox="0 0 360 360" fill="none">
+              <defs>
+                <linearGradient id="orbit-light" x1="60" y1="40" x2="300" y2="310" gradientUnits="userSpaceOnUse">
+                  <stop stopColor="#a4caff" /><stop offset=".45" stopColor="#488df2" /><stop offset="1" stopColor="#297cf5" stopOpacity=".15" />
+                </linearGradient>
+                <radialGradient id="drop-body" cx=".28" cy=".22" r=".8">
+                  <stop stopColor="#f4fbff" /><stop offset=".27" stopColor="#a3d6ff" /><stop offset=".6" stopColor="#378bef" /><stop offset=".87" stopColor="#12519f" /><stop offset="1" stopColor="#7ab9ff" />
+                </radialGradient>
+                <linearGradient id="drop-edge" x1="-12" y1="-20" x2="12" y2="14" gradientUnits="userSpaceOnUse">
+                  <stop stopColor="white" stopOpacity=".9" /><stop offset=".5" stopColor="#8bc8ff" stopOpacity=".2" /><stop offset="1" stopColor="#d9f0ff" stopOpacity=".7" />
+                </linearGradient>
+              </defs>
+              <circle cx="180" cy="180" r="151" stroke="white" strokeOpacity=".035" />
+              <circle cx="180" cy="180" r="132" stroke="white" strokeOpacity=".14" strokeWidth=".8" />
+              <circle ref={trail} cx="180" cy="180" r="132" pathLength="1" stroke="url(#orbit-light)" strokeWidth="1.5" strokeDasharray="1" strokeDashoffset="1" transform="rotate(-90 180 180)" />
+              {STEPS.map((s, i) => {
+                const a = (i / STEPS.length) * Math.PI * 2 - Math.PI / 2;
+                return <circle key={s.title} cx={180 + 132 * Math.cos(a)} cy={180 + 132 * Math.sin(a)} r="3" fill="#8a9ebc" />;
+              })}
+              <g ref={drop} className="cycle-drop" transform="translate(180 48) scale(.8)">
+                <ellipse cx="1" cy="9" rx="13" ry="14" fill="#020b1b" opacity=".4" />
+                <path d="M0-22C-3-14-14-5-14 4a14 14 0 0 0 28 0C14-5 3-14 0-22Z" fill="url(#drop-body)" stroke="url(#drop-edge)" strokeWidth=".9" />
+                <path d="M-3-10C-7-5-10 0-9 4" stroke="white" strokeWidth="2.2" strokeLinecap="round" opacity=".65" />
+                <path d="M3 14c5-1 8-4 9-8" stroke="#c3e6ff" strokeWidth=".8" strokeLinecap="round" opacity=".8" />
+              </g>
+            </svg>
+            <div className="cycle-center">
+              <NextImage src={asset("/logos/ec-icon.svg")} width="34" height="34" alt="" />
+              <span ref={number} className="cycle-number">04</span>
+              <span ref={label} className="cycle-label">The linen cycle</span>
             </div>
           </div>
+          <a href="#contact" className="process-link">Discuss your requirements <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true"><path d="M5 19 19 5M5 5h14v14" /></svg></a>
         </div>
-
-        <div ref={track} className="flex w-max gap-5 px-6 md:gap-8 md:px-10" style={{ willChange: "transform" }}>
-          {STEPS.map((s) => (
-            <article
-              key={s.n}
-              className="flex w-[82vw] max-w-[540px] shrink-0 flex-col overflow-hidden rounded-[1.75rem] border border-white/[0.08] bg-ink-soft md:w-[40vw]"
-            >
-              <div className="relative h-56 md:h-72">
-                {s.video ? (
-                  <>
-                    <video
-                      className="absolute inset-0 h-full w-full object-cover"
-                      src={asset("/media/drum-mobile.mp4")}
-                      poster={asset("/media/drum-poster.jpg")}
-                      autoPlay
-                      muted
-                      loop
-                      playsInline
-                      preload="metadata"
-                    />
-                    <span className="absolute left-4 top-4 flex items-center gap-2 rounded-full bg-ink/70 px-3.5 py-1.5 text-[11px] font-bold tracking-widest text-white backdrop-blur">
-                      <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-red-500" />
-                      INSIDE OUR DRUM
-                    </span>
-                  </>
-                ) : (
-                  <img
-                    src={asset(s.img!)}
-                    alt={s.alt}
-                    className="absolute inset-0 h-full w-full object-cover"
-                    loading="lazy"
-                  />
-                )}
-                <div className="absolute inset-0 bg-gradient-to-t from-ink-soft via-transparent to-transparent" />
+        <div className="process-steps">
+          {STEPS.map((step, i) => (
+            <article className="process-step" key={step.title}>
+              <div className="process-step-copy">
+                <span className="process-number">0{i + 1}</span>
+                <h3>{step.title}</h3>
+                <p>{step.copy}</p>
               </div>
-
-              <div className="flex grow flex-col p-7 md:p-9">
-                <span className="font-display text-5xl font-bold text-white/[0.13] md:text-6xl">{s.n}</span>
-                <h3 className="mt-2 font-display text-2xl font-bold tracking-tight md:text-3xl">{s.title}</h3>
-                <p className="mt-3 leading-relaxed text-white/60">{s.copy}</p>
+              <div className="process-image">
+                <NextImage src={asset(step.img)} alt={step.alt} width="480" height="600" loading="lazy" />
               </div>
             </article>
           ))}
-
-          {/* closing slide */}
-          <article className="flex w-[82vw] max-w-[540px] shrink-0 items-center justify-center rounded-[1.75rem] bg-brand p-10 md:w-[40vw]">
-            <div className="text-center">
-              <p className="font-display text-6xl font-bold tracking-tight md:text-7xl">24h</p>
-              <p className="mt-3 font-display text-2xl font-semibold text-white/90">
-                Door to door. Every day.
-              </p>
-              <a
-                href="#contact"
-                className="mt-8 inline-block rounded-full bg-white px-7 py-3.5 font-display font-semibold text-brand transition-transform duration-200 hover:scale-[1.03]"
-              >
-                Schedule a pick-up
-              </a>
-            </div>
-          </article>
         </div>
       </div>
     </section>
