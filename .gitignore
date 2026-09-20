@@ -42,3 +42,6 @@ next-env.d.ts
 
 # local claude config
 .claude/
+
+# Local document inspection artifacts
+/tmp/
