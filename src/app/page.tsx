@@ -5,6 +5,7 @@ import Nav from "@/components/Nav";
 import Hero from "@/components/Hero";
 import TrustMarquee from "@/components/TrustMarquee";
 import WipeClean from "@/components/WipeClean";
+import Partners from "@/components/Partners";
 import Services from "@/components/Services";
 import Process from "@/components/Process";
 import Stats from "@/components/Stats";
@@ -23,6 +24,7 @@ export default function Home() {
         <Services />
         <Process />
         <WipeClean />
+        <Partners />
         <Stats />
         <CatalogTeaser />
         <CTA />
