@@ -2,6 +2,7 @@ import ArrowIcon from "@/components/ArrowIcon";
 
 import NextImage from "next/image";
 import { asset } from "@/lib/asset";
+import { BUSINESS, SITE_URL } from "@/lib/site";
 
 export default function Footer() {
   return (
@@ -23,9 +24,9 @@ export default function Footer() {
             </div>
             <div><p className="mb-4 text-xs font-bold tracking-[0.2em] text-white/60">CONTACT</p>
               <ul className="space-y-2 text-sm text-white/80">
-                <li><a href="tel:+38348886644">048 88 66 44</a></li>
-                <li>Magjistralja Prishtinë–Gjilan<br />Hajvali, Prishtinë</li>
-                <li><a href="https://www.ecc-usa.com" target="_blank" rel="noopener noreferrer">www.ecc-usa.com <ArrowIcon /></a></li>
+                <li><a href={`tel:${BUSINESS.telephone}`}>{BUSINESS.phone}</a></li>
+                <li>{BUSINESS.street}<br />{BUSINESS.locality}</li>
+                <li><a href={SITE_URL}>ecc-ks.com <ArrowIcon /></a></li>
               </ul>
             </div>
           </div>

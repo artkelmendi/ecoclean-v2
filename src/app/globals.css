@@ -279,6 +279,7 @@ a:focus-visible, button:focus-visible, input:focus-visible { outline: 3px solid 
 .catalog-teaser-copy p { max-width: 390px; margin-top: 24px; color: #526177; line-height: 1.8; }
 .catalog-teaser-copy .button-primary { margin-top: 32px; }
 .catalog-language { display: block; color: #526177; margin-top: 14px; font-size: .75rem; }
+.catalog-downloads { display: flex; flex-wrap: wrap; gap: .75rem 1.5rem; }
 .catalog-cover-link { display: block; max-width: 290px; margin-inline: auto; padding: 12px; }
 .catalog-cover { box-shadow: 12px 20px 35px -12px #102a4540; transform-style: preserve-3d; transform-origin: left center; }
 .catalog-cover img { width: 100%; height: auto; display: block; }

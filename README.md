@@ -40,3 +40,5 @@ Each home section has its own restrained scroll treatment in `PageMotion.tsx`. T
 The hero uses pre-encoded forward/reverse desktop and mobile films for continuous playback without browser reverse-seeking. The brief intro appears once per session, supports Skip and Escape, and is bypassed for deep links and reduced motion. The mobile menu supports keyboard focus containment/restoration. The catalog supports chapter buttons, page selection, arrow keys, original PDF access and selectable Albanian text.
 
 See `DESIGN.md` and `QA.md` for design and verification notes.
+
+See `SEO.md` for search metadata, structured data, brand icons, social-sharing artwork and the pre-deployment `npm run check:seo` checks.

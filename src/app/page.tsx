@@ -11,10 +11,17 @@ import Process from "@/components/Process";
 import Stats from "@/components/Stats";
 import CTA from "@/components/CTA";
 import Footer from "@/components/Footer";
+import StructuredData from "@/components/StructuredData";
+import { HOME_TITLE, HOME_DESCRIPTION, homeStructuredData, pageMetadata } from "@/lib/site";
+
+export const metadata = pageMetadata({
+  title: HOME_TITLE, description: HOME_DESCRIPTION, path: "/", image: "/social/eco-clean-share.jpg",
+});
 
 export default function Home() {
   return (
     <>
+      <StructuredData data={homeStructuredData} />
       <BrandIntro />
       <PageMotion />
       <Nav />

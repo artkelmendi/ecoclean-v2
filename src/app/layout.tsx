@@ -1,6 +1,8 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Poppins, Mulish } from "next/font/google";
 import "./globals.css";
+import { asset } from "@/lib/asset";
+import { BUSINESS, HOME_TITLE, HOME_DESCRIPTION, SITE_URL } from "@/lib/site";
 
 const poppins = Poppins({
   variable: "--font-poppins",
@@ -15,17 +17,24 @@ const mulish = Mulish({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL((process.env.NEXT_PUBLIC_SITE_URL ?? "https://artkelmendi.github.io/ecoclean-v2").replace(/^http:/, "https:")),
-  title: "Eco Clean — Industrial Laundry & Textile Care, Kosovo",
-  description:
-    "Eco Clean provides textile supply and laundry services for hotels, restaurants, hospitals and other businesses across Kosovo and the region.",
-  openGraph: {
-    title: "Eco Clean — The standard of clean.",
-    description:
-      "Textile supply, laundry services and Streamline stock management across Kosovo and the region.",
-    images: [`${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/media/drum-poster.jpg`],
+  metadataBase: new URL(SITE_URL),
+  title: { default: HOME_TITLE, template: "%s | Eco Clean" },
+  description: HOME_DESCRIPTION,
+  applicationName: BUSINESS.name,
+  creator: BUSINESS.name,
+  publisher: BUSINESS.name,
+  category: "Industrial laundry and textile services",
+  robots: {
+    index: true, follow: true,
+    googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1, "max-video-preview": -1 },
+  },
+  icons: {
+    icon: [{ url: asset("/icons/icon-96.png"), sizes: "96x96", type: "image/png" }],
+    apple: [{ url: asset("/icons/apple-touch-icon.png"), sizes: "180x180", type: "image/png" }],
   },
 };
+
+export const viewport: Viewport = { themeColor: "#297cf5" };
 
 export default function RootLayout({
   children,
