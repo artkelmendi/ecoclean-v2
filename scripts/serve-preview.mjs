@@ -4,12 +4,12 @@ import { stat } from "node:fs/promises";
 import { resolve, extname, sep } from "node:path";
 
 const root = resolve("out");
-const base = "/ecoclean-v2";
+const base = (process.env.NEXT_PUBLIC_BASE_PATH ?? "/ecoclean-v2").replace(/\/+$/, "");
 const mime = { ".html": "text/html; charset=utf-8", ".js": "text/javascript", ".css": "text/css", ".json": "application/json", ".svg": "image/svg+xml", ".png": "image/png", ".jpg": "image/jpeg", ".webp": "image/webp", ".pdf": "application/pdf", ".ico": "image/x-icon", ".mp4": "video/mp4", ".woff2": "font/woff2", ".txt": "text/plain" };
 createServer(async (req, res) => {
   try {
     const pathname = decodeURIComponent(new URL(req.url, "http://localhost").pathname);
-    if (pathname === "/" || pathname === base) { res.writeHead(302, { Location: `${base}/` }); res.end(); return; }
+    if (base && (pathname === "/" || pathname === base)) { res.writeHead(302, { Location: `${base}/` }); res.end(); return; }
     if (!pathname.startsWith(`${base}/`)) { res.writeHead(404); res.end(); return; }
     let file = resolve(root, `.${pathname.slice(base.length)}`);
     if (file !== root && !file.startsWith(`${root}${sep}`)) { res.writeHead(403); res.end(); return; }

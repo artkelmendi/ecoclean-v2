@@ -14,6 +14,21 @@ npm run preview
 
 Development runs at localhost:3000. The production export is in `out/`; preview is http://localhost:4175/ecoclean-v2/. The catalog is at `/ecoclean-v2/catalog/`. The preview server supports PDF/video byte ranges. The existing GitHub Actions workflow deploys pushes to main.
 
+## Custom domain
+
+The production domain is https://ecc-ks.com/, with the catalog at `/catalog/`.
+The deployment workflow reads the current GitHub Pages URL before building, so
+assets, routes and social preview URLs match either the custom domain or the
+repository URL. For a local root-domain build and preview, set
+`NEXT_PUBLIC_BASE_PATH=/` and `NEXT_PUBLIC_SITE_URL=https://ecc-ks.com` before
+running the build and preview commands.
+
+Spaceship DNS points the apex (`@`) to GitHub Pages with A records
+`185.199.108.153`, `185.199.109.153`, `185.199.110.153` and `185.199.111.153`.
+The `www` CNAME points to `artkelmendi.github.io`. Keep existing verification and
+email records. GitHub Pages manages the custom domain and HTTPS certificate;
+this Actions-based deployment does not require a CNAME file in the export.
+
 ## Content
 
 The owner-supplied Albanian and English catalogs are the factual sources. See `CONTENT-SOURCES.md` for page mappings. Both original PDFs are preserved under `public/catalog/`; lightweight WebP pages let visitors browse without downloading a full PDF. Extracted selectable text lives in `src/data/`.

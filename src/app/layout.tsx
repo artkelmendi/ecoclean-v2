@@ -15,7 +15,7 @@ const mulish = Mulish({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://artkelmendi.github.io/ecoclean-v2"),
+  metadataBase: new URL((process.env.NEXT_PUBLIC_SITE_URL ?? "https://artkelmendi.github.io/ecoclean-v2").replace(/^http:/, "https:")),
   title: "Eco Clean — Industrial Laundry & Textile Care, Kosovo",
   description:
     "Eco Clean provides textile supply and laundry services for hotels, restaurants, hospitals and other businesses across Kosovo and the region.",
