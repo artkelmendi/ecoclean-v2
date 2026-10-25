@@ -3,6 +3,7 @@ import { Poppins, Mulish } from "next/font/google";
 import "./globals.css";
 import { asset } from "@/lib/asset";
 import { BUSINESS, HOME_TITLE, HOME_DESCRIPTION, SITE_URL } from "@/lib/site";
+import { introBootstrap } from "@/lib/intro";
 
 const poppins = Poppins({
   variable: "--font-poppins",
@@ -42,7 +43,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: introBootstrap }} />
+        <noscript><style>{`.brand-intro{display:none!important}`}</style></noscript>
+      </head>
       <body className={`${poppins.variable} ${mulish.variable} antialiased`}>
         {children}
       </body>

@@ -16,9 +16,33 @@
   --font-sans: var(--font-mulish), ui-sans-serif, system-ui, sans-serif;
   --font-display: var(--font-poppins), ui-sans-serif, system-ui, sans-serif;
 }
-:root { --page-gutter: clamp(1.5rem, 4vw, 2.5rem); --section-space: clamp(5rem, 9vw, 8rem); }
-html { scroll-behavior: smooth; scroll-padding-top: 6.5rem; scrollbar-gutter: stable; overscroll-behavior-y: none; background: var(--color-ink); }
+:root { --page-gutter: clamp(1.5rem, 4vw, 2.5rem); --section-space: clamp(5rem, 9vw, 8rem); --ease-brand-out: cubic-bezier(.23, 1, .32, 1); --ease-brand-in-out: cubic-bezier(.77, 0, .175, 1); }
+html { scroll-behavior: smooth; scroll-padding-top: 6.5rem; scrollbar-gutter: stable; scrollbar-color: #297cf5 #edf3fc; scrollbar-width: thin; overscroll-behavior-y: none; background: var(--color-ink); }
 body { background: #fff; color: var(--color-ink); font-family: var(--font-mulish), sans-serif; overscroll-behavior-y: none; }
+
+/* Keep the native scroll mechanics; only the browser chrome is branded. */
+@supports selector(::-webkit-scrollbar) {
+  html { scrollbar-width: auto; scrollbar-color: auto; }
+  ::-webkit-scrollbar { width: 12px; height: 12px; }
+  ::-webkit-scrollbar-track, ::-webkit-scrollbar-corner { background: #edf3fc; }
+  ::-webkit-scrollbar-thumb { background: #297cf5; border: 3px solid #edf3fc; border-radius: 999px; min-height: 48px; }
+  ::-webkit-scrollbar-thumb:hover { background: #1857c4; }
+  ::-webkit-scrollbar-thumb:active { background: #124ba9; }
+}
+
+/* Native SVG cursors stay exact, with no delayed tracking or extra JavaScript. */
+@media (hover: hover) and (pointer: fine) and (forced-colors: none) {
+  html, body { cursor: url("../../public/cursors/blue-arrow.svg") 4 3, default; }
+  :is(a[href], button:enabled, summary, select, [role="button"]):not([aria-disabled="true"]) { cursor: url("../../public/cursors/blue-hand.svg") 13 3, pointer; }
+  input:not([type="button"]):not([type="submit"]):not([type="checkbox"]):not([type="radio"]), textarea, [contenteditable="true"] { cursor: text; }
+}
+
+@media (forced-colors: active) {
+  html { scrollbar-color: auto; scrollbar-width: auto; }
+  ::-webkit-scrollbar { width: revert; height: revert; }
+  ::-webkit-scrollbar-track, ::-webkit-scrollbar-corner { background: Canvas; }
+  ::-webkit-scrollbar-thumb { background: ButtonText; border-color: Canvas; }
+}
 
 /* Keep the overlay out of document flow, including during its exit. */
 .mobile-menu { visibility: hidden; opacity: 0; pointer-events: none; overscroll-behavior: contain; transition: opacity 300ms ease, visibility 0s 300ms; }
@@ -334,18 +358,28 @@ a:focus-visible, button:focus-visible, input:focus-visible { outline: 3px solid 
 .reader-image-note { margin-top: 20px; font-size: .8rem; color: #526177; }
 @keyframes page-settle { from { opacity: .25; transform: translateY(15px) scale(.982); filter: contrast(.92) blur(2px); clip-path: inset(4% 0 0); } to { opacity: 1; transform: translateY(0) scale(1); filter: contrast(1) blur(0); clip-path: inset(0); } }
 
-/* A brief, centered brand signature, then a soft curved opening onto the film. */
-.brand-intro { position: fixed; inset: 0; z-index: 100; background: #f4f8fb; display: grid; place-items: center; animation: intro-open .7s cubic-bezier(.76,0,.24,1) .9s both; }
-.intro-signature { display: grid; grid-template-columns: 72px auto; align-items: center; gap: 18px; position: relative; padding-block: 28px; }
-.intro-mark { animation: intro-mark .85s cubic-bezier(.16,1,.3,1) both; }
-.intro-word { font: 600 2.5rem/1 var(--font-poppins), sans-serif; letter-spacing: -.035em; animation: intro-word .7s ease-out both; }
-.intro-word span { display: block; margin-top: 12px; color: #526177; font: 500 .75rem/1 var(--font-mulish), sans-serif; letter-spacing: .12em; }
-.intro-seam { position: absolute; bottom: 0; height: 1px; width: 100%; background: #9abbe2; transform-origin: left; animation: intro-seam .8s cubic-bezier(.16,1,.3,1) both; }
-.intro-skip { position: absolute; bottom: 36px; right: 36px; min-height: 44px; padding: 10px; color: #526177; font-size: .8rem; }
-@keyframes intro-mark { from { transform: rotate(-55deg) scale(.82); opacity: .4; } to { transform: rotate(0) scale(1); opacity: 1; } }
-@keyframes intro-word { from { opacity: .35; letter-spacing: .015em; } to { opacity: 1; letter-spacing: -.035em; } }
-@keyframes intro-seam { from { transform: scaleX(0); } to { transform: scaleX(1); } }
-@keyframes intro-open { from { clip-path: ellipse(110% 100% at 50% 0%); } to { clip-path: ellipse(110% 0% at 50% 0%); visibility: hidden; } }
+/* The symbol leads; the original wordmark follows, then two linen-like panels open. */
+.brand-intro { position: fixed; inset: 0; z-index: 100; isolation: isolate; display: grid; place-items: center; animation: intro-dismiss 1ms linear 1.85s forwards; }
+html:has(.brand-intro):not([data-brand-intro="skip"]) { background: #f4f8fb; }
+html[data-brand-intro="skip"] .brand-intro { display: none; }
+.brand-intro::before, .brand-intro::after { content: ""; position: absolute; inset-inline: 0; height: calc(50% + 1px); background: #f4f8fb; z-index: -1; }
+.brand-intro::before { top: 0; animation: intro-panel-top .7s var(--ease-brand-in-out) 1.15s both; }
+.brand-intro::after { bottom: 0; animation: intro-panel-bottom .7s var(--ease-brand-in-out) 1.15s both; }
+.intro-signature { display: flex; flex-direction: column; align-items: center; width: min(76vw, 300px); animation: intro-signature-exit .24s var(--ease-brand-out) 1.1s both; }
+.intro-mark { width: 96px; height: 100px; animation: intro-mark-first .65s var(--ease-brand-out) both; }
+.intro-wordmark-frame { width: 100%; margin-top: 22px; overflow: hidden; }
+.intro-wordmark { width: 100%; height: auto; animation: intro-wordmark-arrive .5s var(--ease-brand-out) .44s both; }
+.intro-seam { height: 2px; width: 72px; margin-top: 26px; background: var(--color-brand); transform-origin: center; animation: intro-seam .45s var(--ease-brand-out) .6s both; }
+.intro-caption { margin-top: 18px; color: #536176; font-size: .65rem; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; animation: intro-caption-arrive .4s var(--ease-brand-out) .52s both; }
+.intro-skip { position: absolute; bottom: max(24px, env(safe-area-inset-bottom)); right: var(--page-gutter); min-height: 44px; padding: 10px; color: #526177; font-size: .75rem; }
+@keyframes intro-mark-first { 0% { transform: translateY(82px) rotate(-28deg) scale(.9); opacity: 0; } 36% { opacity: 1; transform: translateY(82px) rotate(0) scale(1); } 100% { transform: translateY(0) rotate(0) scale(1); opacity: 1; } }
+@keyframes intro-wordmark-arrive { from { opacity: 0; transform: translateY(18px); clip-path: inset(0 0 100%); } to { opacity: 1; transform: none; clip-path: inset(0); } }
+@keyframes intro-caption-arrive { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+@keyframes intro-seam { from { opacity: 0; transform: scaleX(.25); } to { opacity: 1; transform: scaleX(1); } }
+@keyframes intro-signature-exit { to { opacity: 0; transform: translateY(-8px) scale(.97); } }
+@keyframes intro-panel-top { to { transform: translateY(-100%); } }
+@keyframes intro-panel-bottom { to { transform: translateY(100%); } }
+@keyframes intro-dismiss { to { visibility: hidden; pointer-events: none; } }
 @media (max-width: 1023px) {
   .catalog-reader { grid-template-columns: 200px minmax(0, 1fr); gap: 32px; }
   .catalog-teaser-layout { gap: 48px; }
@@ -368,9 +402,9 @@ a:focus-visible, button:focus-visible, input:focus-visible { outline: 3px solid 
   .catalog-contents > p, .catalog-contents > a { display: none; }
   .catalog-reader-main { min-width: 0; }
   .process-intro .section-title { font-size: 1.6rem; }
-  .intro-signature { grid-template-columns: 56px auto; gap: 14px; }
-  .intro-mark { width: 56px; height: 56px; }
-  .intro-word { font-size: 2rem; }
+  .intro-signature { width: min(70vw, 260px); }
+  .intro-mark { width: 80px; height: 83px; }
+  .intro-wordmark-frame { margin-top: 18px; }
 }
 @media (prefers-reduced-motion: reduce) {
   .brand-intro { display: none; }

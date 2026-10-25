@@ -25,11 +25,12 @@ export default function HeroEntrance() {
         .to(".hero-scroll", { opacity: 1, x: 0, duration: .4 }, .72);
     };
     window.addEventListener("ec:intro-complete", run, { once: true });
-    const frame = !document.querySelector(".brand-intro") ? requestAnimationFrame(run) : 0;
+    window.addEventListener("ec:intro-reveal", run, { once: true });
+    const frame = document.documentElement.dataset.brandIntro === "skip" || !document.querySelector(".brand-intro") ? requestAnimationFrame(run) : 0;
     const preference = matchMedia("(prefers-reduced-motion: reduce)");
     const reduce = () => { if (preference.matches) timeline?.progress(1); };
     preference.addEventListener("change", reduce);
-    return () => { cancelAnimationFrame(frame); preference.removeEventListener("change", reduce); window.removeEventListener("ec:intro-complete", run); timeline?.kill(); };
+    return () => { cancelAnimationFrame(frame); preference.removeEventListener("change", reduce); window.removeEventListener("ec:intro-complete", run); window.removeEventListener("ec:intro-reveal", run); timeline?.kill(); };
   }, []);
   return null;
 }

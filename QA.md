@@ -1,4 +1,16 @@
-# Verification — 20 September 2026
+# Verification
+
+## Browser polish — 25 October 2026
+
+- Inspected the first logo frame, original outlined wordmark, custom cursor artwork and settled hero in the production export preview.
+- Verified Escape dismissal, returning-visit pre-paint bypass, scroll-lock cleanup and restored interactive content.
+- Verified an unseen reduced-motion visit bypasses the intro and shows the hero text immediately.
+- Desktop computed styles resolve the branded arrow, link hand and blue rounded scrollbar; high-contrast emulation restores native cursor and scrollbar sizing.
+- At 390 × 844 with touch emulation, the catalog and home have no horizontal overflow and no custom cursor.
+- Production lint, build and the exported SEO checks pass. No browser application errors or hydration warnings were observed.
+- The source preserves immediate Skip, deep-link bypass, a CSS completion state and a JavaScript timeout as fallbacks.
+
+## Earlier verification — 20 September 2026
 
 ## Production checks
 
